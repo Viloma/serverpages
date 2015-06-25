@@ -1,11 +1,13 @@
 // Write your package code here!
 
 var fs = Npm.require('fs');
+var ServerPageTokens = null;
 
 var inDevelopment = function () {
-  return process.env.NODE_ENV === "development";
+  return false;//process.env.NODE_ENV === "development";
 };
  
+
 ServerPages = {
 	inDev: inDevelopment(),
 	templates: {},
@@ -54,7 +56,6 @@ ServerPages = {
 			ServerPages.compileFile(filename);
 		}
 	},
-	title : "Default Title",
 	render : function (template, data, response, meta){
 	    //return "{{>header}}{{>"+template+"}}{{>footer}}";
 	      if(ServerPages.inDev){
@@ -68,21 +69,35 @@ ServerPages = {
 	      }
 
 	      var res = SSR.render(template, data);
-	      var output = "<!DOCTYPE html><html><head><meta name='viewport' content='width=device-width, initial-scale=1'><meta charset='utf-8'>"+
-	      "<link rel='stylesheet' href='/style.css'><link rel='stylesheet' href='http://yui.yahooapis.com/pure/0.6.0/pure-min.css'>"+
-	      "<link rel='stylesheet' href='http://yui.yahooapis.com/pure/0.6.0/grids-responsive-min.css'>";
-	      
-	      var pageTitle = ServerPages.title;
-	      if(meta){
-	        var keys = Object.keys(meta);
-	        for(var k in keys){
-	          if(k === "title")
-	            pageTitle = meta[k]; 
-	          else
-	            output = output + "<meta name='"+k+"' content='"+meta[k]+"'>";
-	        }
-	      }
-	      output= output + "<title>"+pageTitle+"</title>" + "<body>"+res+"</body></html>";
+	      var output = "<!DOCTYPE html><html><head>";
+	      if(ServerPages.templates["head"])
+	      		ouptut = output + ServerPages.templates["head"];
+
+			output += "<meta name='viewport' content='width=device-width, initial-scale=1'><meta charset='utf-8'>";
+
+			if(meta){
+				var keys = Object.keys(meta);				
+				for(var k in keys){
+					var key = keys[k];
+					var val = meta[key];
+				  if(key === "title")
+					output= output + "<title>"+val+"</title>";
+				  else{
+					  if(val === "css")
+						 output +="<link rel='stylesheet' href='"+key+"'>";
+					  else{
+					  		if(val == "script")
+					  			output += "<script src='"+key+"'></script>"
+					  		else
+							    output += "<meta name='"+key+"' content='"+val+"'>";
+						}
+					}
+				}
+			}
+			if(Meteor.users)
+				output =  output + "<script src='/files/spages-check.js'></script>";
+			output += "</head><body>"+res+"</body></html>";
+
 	      //return res;
 	      if(ServerPages.inDev){
 			response.setHeader('cache-control', 'no-cache');
@@ -93,14 +108,29 @@ ServerPages = {
 	      response.write(output);
 	      response.end();
 	}
-};
+}; 
 if (Meteor.isServer) { 
 	Meteor.startup(function(){
-		var prefix = '';
+		var prefix = 'assets/packages/viloma_server-pages/';
 		if(ServerPages.inDev)
-			prefix =  '../../../../../.';
+			prefix =  '../../../../../.spages/';
 		console.log( ' isDev '+ServerPages.inDev + ' cwd: '+ process.cwd());
-		ServerPages.setupPublicFolder('/files', prefix + 'spages/public');
-		ServerPages.setupTemplateFolder( prefix + 'spages/templates'); 
+		ServerPages.setupPublicFolder('/files', prefix + 'public');
+		ServerPages.setupTemplateFolder( prefix + 'templates'); 
 	});
+
+	if(Meteor.isServer && Meteor.users)
+	{
+		if(ServerPageTokens == null)
+			ServerPageTokens = new Mongo.Collection("serverpagetokens");
+		Meteor.methods({
+		  	getServerPageToken: function () {
+		  		if(Meteor.userId()){
+		  			var token = Meteor.uuid();
+		  			ServerPageTokens.insert({_id: token, date : new Date()});
+			  		return token;
+			  	}
+			}
+		});
+	}
 }
