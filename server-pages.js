@@ -4,7 +4,7 @@ var fs = Npm.require('fs');
 var ServerPageTokens = null;
 
 var inDevelopment = function () {
-  return false;//process.env.NODE_ENV === "development";
+  return process.env.NODE_ENV === "development";
 };
  
 
@@ -12,7 +12,13 @@ ServerPages = {
 	inDev: inDevelopment(),
 	templates: {},
 	setupPublicFolder : function(path, folder){
-		StaticServer.add(path, folder);
+	    if (fs.existsSync(folder) && fs.lstatSync(folder).isDirectory()) {
+			StaticServer.add(path, folder);
+			return true;
+	    }
+		else
+			console.log('location is not a directory');
+		return false;
 	},
 	compileTemplate : function(txt, tag){
 		var parts = txt.split("!!!"); 
@@ -33,6 +39,11 @@ ServerPages = {
 	},
 	setupTemplateFolder : function(folder){
 		var dirs = [];
+
+	    if (! (fs.existsSync(folder) && fs.lstatSync(folder).isDirectory())) {
+	    	console.log('could not setupTemplateFolder as '+folder+' is not a directory');
+	    	return false;
+	    }
 		
 		if(ServerPages.inDev){
 			fs.watch(folder, function(event, filename){
@@ -55,6 +66,7 @@ ServerPages = {
 			var filename = folder+'/'+dirs[d];
 			ServerPages.compileFile(filename);
 		}
+		return true;
 	},
 	render : function (template, data, response, meta){
 	    //return "{{>header}}{{>"+template+"}}{{>footer}}";
@@ -132,5 +144,18 @@ if (Meteor.isServer) {
 			  	}
 			}
 		});
+
+		  if( Package['iron:router']){
+		  	console.log('found iron router');
+		  	var Router = Package['iron:router'].Router;
+		    Router.route('/serverPageLogin', function () {
+		    	console.log('got request for serverPageLogin');
+		      this.render('serverPageLogin');
+		    }, {where: 'server'});
+		  }
+		  else
+		  	console.log('no iron router');
 	}
+	else
+		console.log('no accounts package');
 }

@@ -17,9 +17,12 @@ Package.onUse(function(api) {
   api.use('mongo');
   api.use('williamledoux:static-server');
   api.use('meteorhacks:ssr');
+  api.use('iron:router', 'server', {weak: true});
+  api.use('accounts-base', 'server', {weak: true});
   api.addFiles('server-page-user-check.spages', "server");
   api.addFiles('server-page-user-setup.js', "client");
   api.addFiles('server-pages.js', "server");
+  api.addFiles('server-page-login.html');
  api.export('ServerPages', 'server');
 
 });
