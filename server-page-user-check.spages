@@ -10,9 +10,14 @@ function readCookie(name) {
 }
 
 window.addEventListener("load", function() { 
+    //alert('can load stuff here');
+    /*
 	ifrm = document.createElement("IFRAME"); 
 	ifrm.setAttribute("src", "/serverPageLogin"); 
-	ifrm.style.width = 640+"px"; 
-	ifrm.style.height = 480+"px"; 
-	document.body.appendChild(ifrm); 
+    ifrm.style.visibility = 'hidden';
+    ifrm.style.display = 'none'";
+    ifrm.hidden = 'hidden';
+	ifrm.style.width = 0+"px"; 
+	ifrm.style.height = 0+"px"; 
+	document.body.appendChild(ifrm);*/ 
 });
