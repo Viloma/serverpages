@@ -1,8 +1,8 @@
 Package.describe({
   name: 'viloma:server-pages',
-  version: '0.3.0',
+  version: '0.3.2',
   // Brief, one-line summary of the package.
-  summary: 'Package to allow Server side page serving',
+  summary: 'Easily add Server pages to your meteor project',
   // URL to the Git repository containing the source code for this package.
   git: 'https://github.com/Viloma/serverpages.git',
   // By default, Meteor will default to using README.md for documentation.

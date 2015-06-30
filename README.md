@@ -1,4 +1,4 @@
-# Easily add Server pages to your meteor.
+# Easily add Server pages to your meteor project.
 
 Meteor is great at building sophisticated Single Page Applications. But if the application also has traditional (informational) pages - fast load, seo friendly, multipage sections - it is surprisingly difficult to do.
 
@@ -30,8 +30,8 @@ You place need to place static files and templates under .spages folder under pr
 projectroot/.spages/public - for static files
 projectroot/.spages/templates - for templates
 
-* All the files under /.spages/public - are served from url /files/ .
-* All templates under /.spages/templates - are loaded for rendering
+* All the files under **/.spages/public** - are served from url **/files/** .
+* All templates under **/.spages/templates** - are loaded for rendering
 * changes to files in the .spages folder - do not cause meteor to restart - making for a  much better development workflow.
 * templates changes are still picked up on page refresh.
 * Static files and templates are packaged and included in the build.
@@ -39,6 +39,7 @@ projectroot/.spages/templates - for templates
 ### sample templates
 ``` 
 <template name='eventpage'> 
+	<img src='/files/images/logo.jpg' />
     ..... 
 </template>
 <template name='head'> 
@@ -48,6 +49,15 @@ projectroot/.spages/templates - for templates
     <meta ... > head elements for eventpage template go here  
 </template>
 ```
+
+### on the server pages - get the indicative logged in user id.
+- sometimes when showing static pages - you need minor customizations for a user
+- you can get the indicative users using the api ServerPages.getIndicativeUser(this.request)
+```
+ServerPages.getIndicativeUser(this.request)
+ServerPages.getIndicativeUserId(this.request)
+```
+**This should NEVER be used for any sensitive information or for transactions **. Those should happen over DDP in meteor SPA pages.
 
 ### lastly if you dont want to use .spages folder - but just want to compile a template - put it in private folder 
 ```
