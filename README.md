@@ -24,8 +24,8 @@ if(Meteor.isServer){
 }
 ```
 
-### Server Side Static files and Templates
-You place need to place static files and templates under .spages folder under project root folder - 
+### Server Side Static files and Templates (.spages folder)
+You place need to place static files and templates under **.spages folder** under project root folder - 
 
 projectroot/.spages/public - for static files
 projectroot/.spages/templates - for templates
