@@ -39,7 +39,7 @@ function getServerPageToken(){
 	});
 }
 
-var tokenTimer;
+//var tokenTimer;
 
 if(Meteor.isClient){
 	Tracker.autorun(function() {
@@ -50,12 +50,12 @@ if(Meteor.isClient){
 		if (Meteor.userId()) {
 			console.log('logged in - getting token');
 			getServerPageToken();
-			tokenTimer = setInterval(function () {getServerPageToken()}, 60* 60 * 1000);
+//			tokenTimer = setInterval(function () {getServerPageToken()}, 60* 60 * 1000);
 		}
 		else{
 			console.log('logged out');
 			eraseCookie('serverPageToken');
-			window.clearInterval(tokenTimer)
+//			window.clearInterval(tokenTimer)
 		}
 	  }
 	});

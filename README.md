@@ -1,26 +1,65 @@
-#Easily build Server pages in meteor.
+# Easily add Server pages to your meteor.
 
-Meteor is great at building sophisticated Single Page Applications. But if the application also has traditional (informational) pages - fast load, seo friendly, multipage - it is surprisingly difficult to do.
+Meteor is great at building sophisticated Single Page Applications. But if the application also has traditional (informational) pages - fast load, seo friendly, multipage sections - it is surprisingly difficult to do.
 
-## viloma:server-pages - solves this by supporting server only pages. It supports template management, static assets, authentication and dev workflow. 
+### Server Pages - solves this by supporting 
+1. managing templates - just as they are managed on the client
+2. serving static files - from a folder (using ideas from  williamledoux:static-server)
+3. preventing restart on every save in development - but autoloading on refresh.
+4. rendering along with head sections. (using SSR - thanks to meteorhacks:ssr )
+5. getting userId on server side - using a token-cookie linked to userId. To be used for customization only - not for any sensitive information or workflow.
 
-Some of the issues in server side routing are -
+### Installation
+```
+meteor add viloma:server-pages
+```
+### Server Side Routes 
+These can be defined using Iron:Router - note that The **"where: server"** - is Important! 
+```
+if(Meteor.isServer){
+    Router.route('/event/:evtid', function() {
+        var evt = Events.findOne({_id: this.params.evtid});
+      ServerPages.render("eventpage", {e: evt}, this.response);
+    }, {where:'server'});
+}
+```
 
-1. meteor should not automatically reloads - when any change is made to server pages.
-2. all files included in client bundle making it large
-3. handling of templates on server side
-4. authentication on SSR rendered pages 
-5. cannot
+### Server Side Static files and Templates
+You place need to place static files and templates under .spages folder under project root folder - 
 
-for server-pages - solves problem 1 & 2 by having static pages placed in a directory that is hidden from meteor called - .spages
-.spages/public - files are made available over http - at the address files/filename
-.spages/templates - templates are automatically loaded and compiled on server side
+projectroot/.spages/public - for static files
+projectroot/.spages/templates - for templates
 
-- server rendered pages - do not load all meteor and app packages - so are fast.
-- these files are not pushed to the client - keeping it separate and client bundles small.
-- 
+* All the files under /.spages/public - are served from url /files/ .
+* All templates under /.spages/templates - are loaded for rendering
+* changes to files in the .spages folder - do not cause meteor to restart - making for a  much better development workflow.
+* templates changes are still picked up on page refresh.
+* Static files and templates are packaged and included in the build.
 
+### sample templates
+``` 
+<template name='eventpage'> 
+    ..... 
+</template>
+<template name='head'> 
+    <script ... > <link ... > This is common head tag for all pages 
+</template>
+<template name='head-eventpage'> 
+    <meta ... > head elements for eventpage template go here  
+</template>
+```
 
-What this does not solve -
-1. SSR seems to mean - rendering same pages on client and server. That is not what this does.
-2. 
+### lastly if you dont want to use .spages folder - but just want to compile a template - put it in private folder 
+```
+ServerPages.compileTemplate(Assets.getText('filename.txt'))
+```
+
+* [meteorhacks:ssr] - rendering blaze and jade templates on server side.
+* [staticserver] - rendering static files from server [@thomasfuchs].
+
+License
+----
+MIT
+
+[meteorhacks:ssr]:https://github.com/williamledoux/meteor-static-server
+[staticserver]:https://github.com/meteorhacks/meteor-ssr

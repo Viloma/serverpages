@@ -1,6 +1,6 @@
 Package.describe({
   name: 'viloma:server-pages',
-  version: '0.0.1',
+  version: '0.3.0',
   // Brief, one-line summary of the package.
   summary: 'Package to allow Server side page serving',
   // URL to the Git repository containing the source code for this package.
@@ -21,8 +21,8 @@ Package.onUse(function(api) {
   api.use('deps');
   api.use('mongo');
   api.use('webapp', 'server');
-  api.use('templating', 'client');
-  api.use('iron:router@1.0.9', 'server', {weak: true});
+//  api.use('templating', 'client');
+//  api.use('iron:router@1.0.9', 'server', {weak: true});
   api.use('meteorhacks:ssr@2.1.2', 'server');
   api.use('accounts-base', 'server', {weak: true});
   

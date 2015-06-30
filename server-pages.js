@@ -147,11 +147,14 @@ ServerPages = {
 		// read files in the folder and comple templates
 		dirs = fs.readdirSync(folder);
 		for(var d in dirs){
-//			console.log('compiling '+dirs[d]);
+			console.log('compiling '+dirs[d]);
 			// ignore bad files
 			if(!toBeIgnored(dirs[d])){
 				var filename = folder+'/'+dirs[d];
-				ServerPages.compileFile(filename);
+				if(fs.lstatSync(filename).isFile())
+					ServerPages.compileFile(filename);
+				else // recursively setup child folders
+					ServerPages.setupTemplateFolder(filename);
 			}
 		}
 		return true;
@@ -221,17 +224,26 @@ ServerPages = {
 // - getUserInsecure - if accounts is used - then this api - lets SSR routes find out the userId
 //				- this api uses Cookies which has known vulnerabilities - so it should NOT be used for sensitive information
 //				- this api should be used for SSR customization purposes only - all transactions should happen over client side Meteor
-	getUserInsecure : function(request){
-		if(request && request.headers && request.cookie){
+	getIndicativeUserId : function(request){
+		if(request && request.headers && request.headers.cookie){
 			// serverPageToken is set by server-page-user-setup.js if accounts package is present
 			var token = getCookies(request.headers.cookie)['serverPageToken'];
+			//console.log('got token '+token);
 			if(token){
 				// find the user corresponding to the token
 				var tokenRec = ServerPageTokens.findOne({_id: token});
 				if(tokenRec)
 					return tokenRec.user;
+				else
+					console.log('no token rec '+token);
+
 			}
 		}
+	},
+	getIndicativeUser: function(request){
+		var userId = getIndicativeUserId(request);
+		if(userId)
+			return Meteor.users.findOne(userId);
 	}
 }; 
 if (Meteor.isServer) { 
@@ -259,10 +271,13 @@ if (Meteor.isServer) {
 			Meteor.methods({
 			  	getServerPageToken: function () {
 			  		if(Meteor.userId()){
-			  			var token = Meteor.uuid();
-			  			// assign a new token to every call of this function
-			  			ServerPageTokens.insert({_id: token, user: Meteor.userId(), date : new Date()});
-				  		return token;
+				  		// assign a new token to every call of this function
+			  			var userRec = Meteor.find({user: Meteor.userId()});
+			  			if(!userRec){
+			  				userRec = {_id: Meteor.uuid(), user: Meteor.userId(), date : new Date()};
+				  			ServerPageTokens.insert(userRec);
+				  		}
+				  		return userRec._id;
 				  	}
 				}
 			});
