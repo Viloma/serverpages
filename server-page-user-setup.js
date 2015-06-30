@@ -32,7 +32,7 @@ function getServerPageToken(){
 	console.log('calling token timer');
 	Meteor.call('getServerPageToken', function(err, id){
 		if(!err){
-			createCookie('serverPageToken', id, 6);
+			createCookie('serverPageToken', id, 24 * 14); // 2 weeks expiry
 		}
 		else
 			console.log('error getting token :' +err);
