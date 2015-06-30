@@ -39,7 +39,7 @@ projectroot/.spages/templates - for templates
 ### sample templates
 ``` 
 <template name='eventpage'> 
-
+	<img src='/files/images/logo.jpg' />
     ..... 
 </template>
 <template name='head'> 
