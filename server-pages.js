@@ -159,6 +159,9 @@ ServerPages = {
 		}
 		return true;
 	},
+	checkTemplateExists: function(templatename){
+		return templates[templatename];
+	},
 	render : function (template, data, response, meta){
 		// in dev mode - if the temlate has been marked dirty then reload it
 	      if(ServerPages.inDev){
@@ -185,6 +188,7 @@ ServerPages = {
 
 //			output += "<meta name='viewport' content='width=device-width, initial-scale=1'><meta charset='utf-8'>";
 
+			var contentType = "text/html";
 			// if meta has been defined in code - append it to the head
 			if(meta){
 				var keys = Object.keys(meta);				
@@ -199,8 +203,12 @@ ServerPages = {
 					  else{
 					  		if(val == "script")
 					  			output += "<script src='"+key+"'></script>"
-					  		else
-							    output += "<meta name='"+key+"' content='"+val+"'>";
+					  		else{
+					  			if(val == "content-type")
+					  				contentType = key;
+					  			else
+								    output += "<meta name='"+key+"' content='"+val+"'>";
+					  		}
 						}
 					}
 				}
@@ -217,7 +225,7 @@ ServerPages = {
 	      }
 
 	      // write out the whole result
-	      response.writeHead(200, {'Content-Type': 'text/html'});
+	      response.writeHead(200, {'Content-Type': contentType});
 	      response.write(output);
 	      response.end();
 	},
@@ -272,7 +280,7 @@ if (Meteor.isServer) {
 			  	getServerPageToken: function () {
 			  		if(Meteor.userId()){
 				  		// assign a new token to every call of this function
-			  			var userRec = Meteor.find({user: Meteor.userId()});
+			  			var userRec = ServerPageTokens.findOne({user: Meteor.userId()});
 			  			if(!userRec){
 			  				userRec = {_id: Meteor.uuid(), user: Meteor.userId(), date : new Date()};
 				  			ServerPageTokens.insert(userRec);
