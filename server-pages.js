@@ -179,7 +179,9 @@ ServerPages = {
 	      var output = "<!DOCTYPE html><html><head>";
 
 	      // append a common head template - if present
-	      if(ServerPages.templates["head"])
+	      if(ServerPages.templates[template+"-head"])
+	      		output += ServerPages.templates[template+"-head"].text;	      
+	      else if(ServerPages.templates["head"])
 	      		output += ServerPages.templates["head"].text;
 
 	      	// if template specific head is present - append that
