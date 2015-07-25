@@ -1,6 +1,6 @@
 Package.describe({
   name: 'viloma:server-pages',
-  version: '0.3.4',
+  version: '0.3.5',
   // Brief, one-line summary of the package.
   summary: 'Easily add Server pages to your meteor project',
   // URL to the Git repository containing the source code for this package.
